@@ -246,19 +246,21 @@ function filterAdminReviews() {
  * Handle review form submission
  * @param {Event} event - Form submit event
  */
-function handleReviewSubmit(event) {
+async function handleReviewSubmit(event) {
     event.preventDefault();
-    
+
     const reviewId = document.getElementById('review-id').value;
     const isEditing = reviewId !== '';
-    
+
     // Gather form data
     // Get selected platforms from checkboxes
     const selectedPlatforms = Array.from(document.querySelectorAll('input[name="platform"]:checked')).map(cb => cb.value);
-    
+    const modes = document.getElementById('review-modes')?.value.split(',').map(m => m.trim()).filter(m => m) || [];
+
     const reviewData = {
         title: document.getElementById('review-title').value.trim(),
         genre: document.getElementById('review-genre').value,
+        modes: modes,
         platform: selectedPlatforms,
         rating: parseInt(document.getElementById('review-rating').value),
         author: document.getElementById('review-author').value,
@@ -283,23 +285,48 @@ function handleReviewSubmit(event) {
         return;
     }
     
-    // If featured, unset other featured reviews
+    // If featured, unset other featured reviews (local copy)
     if (reviewData.featured) {
-        const allReviews = window.ReviewsData.getAllReviews();
+        const allReviews = (window.ReviewsData && window.ReviewsData.getAllReviews) ? window.ReviewsData.getAllReviews() : [];
         allReviews.forEach(r => {
-            if (r.featured && (!isEditing || r.id !== parseInt(reviewId))) {
-                window.ReviewsData.updateReview(r.id, { featured: false });
+            if (r.featured && (!isEditing || (r.id && r.id !== reviewId))) {
+                if (window.ReviewsData && window.ReviewsData.updateReview) {
+                    window.ReviewsData.updateReview(r.id, { featured: false });
+                }
             }
         });
     }
-    
-    // Save review
-    if (isEditing) {
-        window.ReviewsData.updateReview(parseInt(reviewId), reviewData);
-        window.GameReviewUtils.showToast('Review updated successfully!', 'success');
-    } else {
-        window.ReviewsData.addReview(reviewData);
-        window.GameReviewUtils.showToast('Review added successfully!', 'success');
+
+    // Save review: prefer Firebase if available
+    try {
+        if (window.FirebaseReviews && window.FirebaseReviews.addReview) {
+            if (isEditing) {
+                // reviewId may be slug or id depending on storage
+                const idToUpdate = reviewId || window.FirebaseReviews.generateSlug(reviewData.title);
+                await window.FirebaseReviews.updateReview(idToUpdate, reviewData);
+                window.GameReviewUtils.showToast('Review updated successfully!', 'success');
+            } else {
+                const res = await window.FirebaseReviews.addReview(reviewData);
+                if (res && res.success) {
+                    window.GameReviewUtils.showToast('Review added successfully!', 'success');
+                } else {
+                    throw new Error(res.error || 'Failed to save in Firebase');
+                }
+            }
+        } else {
+            // Fallback to local ReviewsData
+            if (isEditing) {
+                window.ReviewsData.updateReview(parseInt(reviewId), reviewData);
+                window.GameReviewUtils.showToast('Review updated successfully!', 'success');
+            } else {
+                window.ReviewsData.addReview(reviewData);
+                window.GameReviewUtils.showToast('Review added successfully!', 'success');
+            }
+        }
+    } catch (err) {
+        console.error('Error saving review:', err);
+        window.GameReviewUtils.showToast('Error saving review. See console for details.', 'error');
+        return;
     }
     
     // Refresh data and show reviews list
@@ -328,39 +355,103 @@ function getAuthorAvatar(author) {
  * Edit an existing review
  * @param {number} id - Review ID
  */
-function editReview(id) {
-    const review = window.ReviewsData.getReviewById(id);
+async function editReview(id) {
+    let review = (window.ReviewsData && window.ReviewsData.getReviewById) ? window.ReviewsData.getReviewById(id) : null;
+
+    // If review exists but missing modes (or other fields), try fetching from Firebase
+    if (window.FirebaseReviews && window.FirebaseReviews.getReviewBySlug) {
+        try {
+            // Determine a slug to fetch: prefer review.slug, otherwise generate from title
+            const slugToFetch = (review && review.slug) ? review.slug : (review && review.title ? window.ReviewsData.generateSlug(review.title) : null);
+            if (!review && slugToFetch) {
+                const fetched = await window.FirebaseReviews.getReviewBySlug(slugToFetch);
+                if (fetched) review = fetched;
+            } else if (review && (!review.modes || review.modes.length === 0)) {
+                const slug = review.slug || window.ReviewsData.generateSlug(review.title);
+                const fetched = await window.FirebaseReviews.getReviewBySlug(slug);
+                if (fetched) review = { ...review, ...fetched };
+            }
+        } catch (err) {
+            console.warn('Could not fetch review from Firebase:', err);
+        }
+    }
+
     if (!review) {
         window.GameReviewUtils.showToast('Review not found.', 'error');
         return;
     }
-    
+
+    // If modes missing, try to auto-fill from RAWG by searching the title, then save back to Firebase/local
+    try {
+        const modesElement = document.getElementById('review-modes');
+        const hasModes = review.modes && Array.isArray(review.modes) && review.modes.length > 0;
+        if (!hasModes && window.RAWG && review.title) {
+            const searchResults = await window.RAWG.searchGames(review.title);
+            if (searchResults && searchResults.length > 0) {
+                const gid = searchResults[0].id;
+                const gameDetails = await window.RAWG.getGameDetails(gid);
+                const detectedModes = (window.RAWG.mapModes && typeof window.RAWG.mapModes === 'function') ? window.RAWG.mapModes(gameDetails) : [];
+                if (detectedModes && detectedModes.length > 0 && modesElement) {
+                    modesElement.value = detectedModes.join(', ');
+
+                    // Persist modes back to remote/local so future edits show them
+                    const modesPayload = { modes: detectedModes };
+                    try {
+                        if (window.FirebaseReviews && window.FirebaseReviews.updateReview) {
+                            const docId = review.slug || review.id || window.ReviewsData.generateSlug(review.title);
+                            await window.FirebaseReviews.updateReview(docId, modesPayload);
+                        }
+                    } catch (err) {
+                        // ignore firebase update errors, try local fallback
+                        console.warn('Failed to update modes in Firebase:', err);
+                    }
+
+                    // Update local store if present
+                    if (window.ReviewsData && window.ReviewsData.updateReview) {
+                        try {
+                            if (review.id) {
+                                window.ReviewsData.updateReview(review.id, modesPayload);
+                            }
+                        } catch (e) { /* ignore */ }
+                    }
+                }
+            }
+        }
+    } catch (err) {
+        console.warn('Auto-fill modes failed:', err);
+    }
+
     // Populate form
-    document.getElementById('review-id').value = review.id;
-    document.getElementById('review-title').value = review.title;
-    document.getElementById('review-genre').value = review.genre;
-    
-    // Set platform checkboxes
+    document.getElementById('review-id').value = review.id || review.slug || '';
+    document.getElementById('review-title').value = review.title || '';
+    document.getElementById('review-genre').value = review.genre || '';
+
+    // Modes (array -> comma list)
+    if (document.getElementById('review-modes')) {
+        document.getElementById('review-modes').value = Array.isArray(review.modes) ? review.modes.join(', ') : (review.modes || '');
+    }
+
+    // Set platform checkboxes (safe)
     document.querySelectorAll('input[name="platform"]').forEach(cb => {
-        cb.checked = review.platform.includes(cb.value);
+        try { cb.checked = Array.isArray(review.platform) ? review.platform.includes(cb.value) : (review.platform === cb.value); } catch (e) { cb.checked = false; }
     });
-    
-    document.getElementById('review-rating').value = review.rating;
-    document.getElementById('review-author').value = review.author;
-    document.getElementById('review-date').value = review.date;
-    document.getElementById('review-featured').checked = review.featured;
-    document.getElementById('review-cover').value = review.coverImage;
-    document.getElementById('review-header').value = review.headerImage;
-    document.getElementById('review-tags').value = review.tags.join(', ');
-    document.getElementById('review-content').value = review.content;
-    
+
+    document.getElementById('review-rating').value = review.rating || '';
+    document.getElementById('review-author').value = review.author || '';
+    document.getElementById('review-date').value = review.date || '';
+    document.getElementById('review-featured').checked = !!review.featured;
+    document.getElementById('review-cover').value = review.coverImage || '';
+    document.getElementById('review-header').value = review.headerImage || '';
+    document.getElementById('review-tags').value = Array.isArray(review.tags) ? review.tags.join(', ') : (review.tags || '');
+    document.getElementById('review-content').value = review.content || '';
+
     // Update form title
     document.getElementById('form-title').textContent = 'Edit Review';
-    
+
     // Show form section
     document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none');
     document.getElementById('section-add-review').style.display = 'block';
-    
+
     // Update nav
     document.querySelectorAll('.admin-nav a').forEach(link => link.classList.remove('active'));
 }
@@ -378,6 +469,11 @@ function resetForm() {
     document.querySelectorAll('input[name="platform"]').forEach(cb => {
         cb.checked = false;
     });
+
+    // Clear modes
+    if (document.getElementById('review-modes')) {
+        document.getElementById('review-modes').value = '';
+    }
 }
 
 /**

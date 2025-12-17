@@ -551,6 +551,13 @@ img {
     margin-bottom: var(--spacing-2xl);
 }
 
+/* Keep featured card height stable and columns equal height */
+.featured-review {
+    min-height: 400px;
+    height: 420px; /* fixed desktop height to prevent shrinking */
+    align-items: stretch;
+}
+
 .featured-review-image {
     position: relative;
     min-height: 400px;
@@ -566,7 +573,9 @@ img {
     padding: var(--spacing-xl);
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start; /* prevent vertical centering that causes height shifts */
+    height: 100%;
+    overflow: hidden;
 }
 
 .featured-badge {
@@ -593,6 +602,27 @@ img {
     color: var(--text-secondary);
     font-size: 1.1rem;
     margin-bottom: var(--spacing-lg);
+}
+
+/* Clamp excerpt to a fixed number of lines to avoid card resizing */
+.featured-review-excerpt {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Make featured card responsive: allow auto height on small screens */
+@media (max-width: 900px) {
+    .featured-review {
+        height: auto;
+        min-height: 300px;
+        grid-template-columns: 1fr; /* stack columns on mobile */
+    }
+
+    .featured-review-image {
+        min-height: 300px;
+    }
 }
 
 /* ============================================

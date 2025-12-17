@@ -341,14 +341,57 @@
                     <form id="review-form" onsubmit="handleReviewSubmit(event)">
                         <input type="hidden" id="review-id" value="">
                         
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg);">
-                            <!-- Left Column -->
-                            <div>
+                        <!-- Game Search Section -->
+                        <div class="form-group" style="margin-bottom: var(--spacing-xl); padding-bottom: var(--spacing-lg); border-bottom: 1px solid var(--border-color);">
+                            <label for="game-search" style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                                🔍 Search Game (RAWG API)
+                            </label>
+                            <div style="position: relative;">
+                                <input type="text" 
+                                       id="game-search" 
+                                       placeholder="Type a game name to auto-fill..." 
+                                       oninput="handleGameSearch(this.value)"
+                                       autocomplete="off">
+                                <span id="search-message" style="font-size: 0.85rem; margin-top: var(--spacing-xs); display: block;"></span>
+                                <div id="game-search-results" style="
+                                    display: none;
+                                    position: absolute;
+                                    top: 100%;
+                                    left: 0;
+                                    right: 0;
+                                    max-height: 400px;
+                                    overflow-y: auto;
+                                    background: #181c24;
+                                    border: 1px solid var(--border-color);
+                                    border-radius: var(--radius-md);
+                                    z-index: 100;
+                                    margin-top: var(--spacing-xs);
+                                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                                    opacity: 1;
+                                "></div>
+                            </div>
+                            <small style="color: var(--text-muted);">Search for a game to auto-fill title, genre, platforms, and cover image</small>
+                        </div>
+                        
+                        <div style="display: flex; flex-direction: column; gap: var(--spacing-lg);">
+                            <!-- Row 1: Title, Developers, Publishers -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--spacing-lg);">
                                 <div class="form-group">
                                     <label for="review-title">Game Title *</label>
                                     <input type="text" id="review-title" required placeholder="e.g., Elden Ring">
                                 </div>
-                                
+                                <div class="form-group">
+                                    <label for="review-developers">Main Developers</label>
+                                    <input type="text" id="review-developers" placeholder="e.g., FromSoftware" autocomplete="off">
+                                </div>
+                                <div class="form-group">
+                                    <label for="review-publishers">Publishers</label>
+                                    <input type="text" id="review-publishers" placeholder="e.g., Bandai Namco Entertainment" autocomplete="off">
+                                </div>
+                            </div>
+
+                            <!-- Row 2: Genre, Cover, Header -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--spacing-lg);">
                                 <div class="form-group">
                                     <label for="review-genre">Genre *</label>
                                     <select id="review-genre" required>
@@ -367,45 +410,37 @@
                                         <option value="Other">Other</option>
                                     </select>
                                 </div>
-                                
                                 <div class="form-group">
-                                    <label>Platforms *</label>
-                                    <div id="review-platforms" class="platform-checkboxes" style="display: flex; flex-wrap: wrap; gap: var(--spacing-sm); margin-top: var(--spacing-xs);">
-                                        <label class="platform-checkbox">
-                                            <input type="checkbox" name="platform" value="PC"> PC
-                                        </label>
-                                        <label class="platform-checkbox">
-                                            <input type="checkbox" name="platform" value="PS5"> PS5
-                                        </label>
-                                        <label class="platform-checkbox">
-                                            <input type="checkbox" name="platform" value="PS4"> PS4
-                                        </label>
-                                        <label class="platform-checkbox">
-                                            <input type="checkbox" name="platform" value="Xbox Series X"> Xbox Series X
-                                        </label>
-                                        <label class="platform-checkbox">
-                                            <input type="checkbox" name="platform" value="Xbox One"> Xbox One
-                                        </label>
-                                        <label class="platform-checkbox">
-                                            <input type="checkbox" name="platform" value="Nintendo Switch"> Nintendo Switch
-                                        </label>
-                                        <label class="platform-checkbox">
-                                            <input type="checkbox" name="platform" value="Steam Deck"> Steam Deck
-                                        </label>
-                                        <label class="platform-checkbox">
-                                            <input type="checkbox" name="platform" value="Mobile"> Mobile
-                                        </label>
-                                    </div>
+                                    <label for="review-cover">Cover Image URL</label>
+                                    <input type="url" id="review-cover" placeholder="https://example.com/image.jpg">
+                                    <small style="color: var(--text-muted);">Recommended: 800x600 pixels</small>
                                 </div>
-                                
+                                <div class="form-group">
+                                    <label for="review-header">Header Image URL</label>
+                                    <input type="url" id="review-header" placeholder="https://example.com/header.jpg">
+                                    <small style="color: var(--text-muted);">Recommended: 1600x900 pixels</small>
+                                </div>
+                            </div>
+
+                            <!-- Row 3: Game Modes, Tags, Review Date -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--spacing-lg);">
+                                <div class="form-group">
+                                    <label for="review-modes">Game Modes</label>
+                                    <input type="text" id="review-modes" placeholder="e.g., Singleplayer, Multiplayer, Co-op">
+                                    <small style="color: var(--text-muted);">Comma-separated (saved and shown on game details)</small>
+                                </div>
                                 <div class="form-group">
                                     <label for="review-tags">Tags (comma-separated)</label>
                                     <input type="text" id="review-tags" placeholder="e.g., Open World, Fantasy, Souls-like">
                                 </div>
+                                <div class="form-group">
+                                    <label for="review-date">Review Date</label>
+                                    <input type="date" id="review-date">
+                                </div>
                             </div>
-                            
-                            <!-- Right Column -->
-                            <div>
+
+                            <!-- Row 4: Author, Rating, Featured -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--spacing-lg);">
                                 <div class="form-group">
                                     <label for="review-author">Author *</label>
                                     <select id="review-author" required>
@@ -415,35 +450,45 @@
                                         <option value="Sam">Sam</option>
                                     </select>
                                 </div>
-                                
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
-                                    <div class="form-group">
-                                        <label for="review-rating">Rating (1-10) *</label>
-                                        <input type="number" id="review-rating" required min="1" max="10" placeholder="8">
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="review-date">Review Date</label>
-                                        <input type="date" id="review-date">
-                                    </div>
-                                </div>
-                                
                                 <div class="form-group">
-                                    <label for="review-cover">Cover Image URL</label>
-                                    <input type="url" id="review-cover" placeholder="https://example.com/image.jpg">
-                                    <small style="color: var(--text-muted);">Recommended: 800x600 pixels</small>
+                                    <label for="review-rating">Rating (1-10) *</label>
+                                    <input type="number" id="review-rating" required min="1" max="10" placeholder="8">
                                 </div>
-                                
-                                <div class="form-group">
-                                    <label for="review-header">Header Image URL</label>
-                                    <input type="url" id="review-header" placeholder="https://example.com/header.jpg">
-                                    <small style="color: var(--text-muted);">Recommended: 1600x900 pixels</small>
-                                </div>
-                                
                                 <div class="form-group">
                                     <label for="review-featured">
                                         <input type="checkbox" id="review-featured" style="width: auto; margin-right: var(--spacing-sm);">
                                         Featured Review
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Row 5: Platforms (full-width) -->
+                            <div class="form-group">
+                                <label>Platforms *</label>
+                                <div id="review-platforms" class="platform-checkboxes" style="display: flex; flex-wrap: wrap; gap: var(--spacing-sm); margin-top: var(--spacing-xs);">
+                                    <label class="platform-checkbox">
+                                        <input type="checkbox" name="platform" value="PC"> PC
+                                    </label>
+                                    <label class="platform-checkbox">
+                                        <input type="checkbox" name="platform" value="PS5"> PS5
+                                    </label>
+                                    <label class="platform-checkbox">
+                                        <input type="checkbox" name="platform" value="PS4"> PS4
+                                    </label>
+                                    <label class="platform-checkbox">
+                                        <input type="checkbox" name="platform" value="Xbox Series X"> Xbox Series X
+                                    </label>
+                                    <label class="platform-checkbox">
+                                        <input type="checkbox" name="platform" value="Xbox One"> Xbox One
+                                    </label>
+                                    <label class="platform-checkbox">
+                                        <input type="checkbox" name="platform" value="Nintendo Switch"> Nintendo Switch
+                                    </label>
+                                    <label class="platform-checkbox">
+                                        <input type="checkbox" name="platform" value="Steam Deck"> Steam Deck
+                                    </label>
+                                    <label class="platform-checkbox">
+                                        <input type="checkbox" name="platform" value="Mobile"> Mobile
                                     </label>
                                 </div>
                             </div>
@@ -526,6 +571,7 @@
     <!-- Firebase Config & Reviews -->
     <script src="js/firebase-config.js"></script>
     <script src="js/firebase-reviews.js"></script>
+    <script src="js/rawg-api.js"></script>
     
     <!-- Admin Authentication Script -->
     <script>
@@ -736,6 +782,7 @@
             const reviewData = {
                 title: document.getElementById('review-title').value.trim(),
                 genre: document.getElementById('review-genre').value,
+                modes: document.getElementById('review-modes')?.value.split(',').map(t => t.trim()).filter(t => t),
                 platform: platforms,
                 rating: parseFloat(document.getElementById('review-rating').value),
                 author: author,
@@ -745,6 +792,8 @@
                 coverImage: document.getElementById('review-cover').value.trim() || 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=800&h=600&fit=crop',
                 headerImage: document.getElementById('review-header').value.trim() || 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=1600&h=900&fit=crop',
                 tags: document.getElementById('review-tags').value.split(',').map(t => t.trim()).filter(t => t),
+                developers: document.getElementById('review-developers').value.split(',').map(t => t.trim()).filter(t => t),
+                publishers: document.getElementById('review-publishers').value.split(',').map(t => t.trim()).filter(t => t),
                 excerpt: excerpt,
                 content: content
             };
@@ -774,33 +823,65 @@
         
         // Edit review
         async function editReview(id) {
-            const review = await window.FirebaseReviews.getReviewBySlug(id);
+            let review = await window.FirebaseReviews.getReviewBySlug(id);
             if (!review) {
                 alert('Review not found');
                 return;
             }
-            
+
             // Populate form
             document.getElementById('review-id').value = id;
-            document.getElementById('review-title').value = review.title;
-            document.getElementById('review-genre').value = review.genre;
-            document.getElementById('review-rating').value = review.rating;
-            document.getElementById('review-author').value = review.author;
-            document.getElementById('review-date').value = review.date;
-            document.getElementById('review-featured').checked = review.featured;
+            document.getElementById('review-title').value = review.title || '';
+            document.getElementById('review-genre').value = review.genre || '';
+            document.getElementById('review-rating').value = review.rating || '';
+            document.getElementById('review-author').value = review.author || '';
+            document.getElementById('review-date').value = review.date || '';
+            document.getElementById('review-featured').checked = !!review.featured;
             document.getElementById('review-cover').value = review.coverImage || '';
             document.getElementById('review-header').value = review.headerImage || '';
-            document.getElementById('review-tags').value = review.tags ? review.tags.join(', ') : '';
-            document.getElementById('review-content').value = review.content;
-            
+            document.getElementById('review-tags').value = review.tags ? (Array.isArray(review.tags) ? review.tags.join(', ') : review.tags) : '';
+            document.getElementById('review-content').value = review.content || '';
+            document.getElementById('review-developers').value = review.developers ? (Array.isArray(review.developers) ? review.developers.join(', ') : review.developers) : '';
+            document.getElementById('review-publishers').value = review.publishers ? (Array.isArray(review.publishers) ? review.publishers.join(', ') : review.publishers) : '';
+
             // Set platform checkboxes
             document.querySelectorAll('input[name="platform"]').forEach(cb => {
                 cb.checked = review.platform && review.platform.includes(cb.value);
             });
-            
+
+            // Populate modes if present
+            if (document.getElementById('review-modes')) {
+                if (review.modes && Array.isArray(review.modes) && review.modes.length > 0) {
+                    document.getElementById('review-modes').value = review.modes.join(', ');
+                } else {
+                    // attempt to auto-fill modes from RAWG and persist
+                    try {
+                        if (window.RAWG && review.title) {
+                            const results = await window.RAWG.searchGames(review.title);
+                            if (results && results.length > 0) {
+                                const gameId = results[0].id;
+                                const gameDetails = await window.RAWG.getGameDetails(gameId);
+                                const detected = (window.RAWG.mapModes && typeof window.RAWG.mapModes === 'function') ? window.RAWG.mapModes(gameDetails) : [];
+                                if (detected && detected.length > 0) {
+                                    document.getElementById('review-modes').value = detected.join(', ');
+                                    // persist back to Firebase
+                                    try {
+                                        await window.FirebaseReviews.updateReview(id, { modes: detected });
+                                    } catch (err) {
+                                        console.warn('Failed to persist modes to Firebase:', err);
+                                    }
+                                }
+                            }
+                        }
+                    } catch (err) {
+                        console.warn('Auto-fill modes failed:', err);
+                    }
+                }
+            }
+
             // Update form title
             document.getElementById('form-title').textContent = 'Edit Review';
-            
+
             // Show form section
             showSection('section-add-review');
         }
@@ -826,6 +907,10 @@
             document.getElementById('form-title').textContent = 'Add New Review';
             document.getElementById('review-date').value = new Date().toISOString().split('T')[0];
             document.querySelectorAll('input[name="platform"]').forEach(cb => cb.checked = false);
+            // Clear game search
+            document.getElementById('game-search').value = '';
+            document.getElementById('game-search-results').style.display = 'none';
+            document.getElementById('search-message').textContent = '';
         }
         
         // Show section

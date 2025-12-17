@@ -551,15 +551,12 @@ function renderReviewContent(review) {
     // Update review info
     document.getElementById('review-title').textContent = review.title;
     
-    // Update meta information
+    // Update meta information (only Date and Author)
     const metaContainer = document.getElementById('review-meta');
     if (metaContainer) {
-        const platforms = Array.isArray(review.platform) ? review.platform.join(', ') : review.platform;
         metaContainer.innerHTML = `
             <span class="review-meta-item">Date: ${window.ReviewsData.formatDate(review.date)}</span>
             <span class="review-meta-item">By: ${review.author}</span>
-            <span class="review-meta-item">Genre: ${review.genre}</span>
-            <span class="review-meta-item">Platform: ${platforms}</span>
         `;
     }
     
@@ -596,13 +593,22 @@ function renderReviewContent(review) {
     const platforms = Array.isArray(review.platform) ? review.platform.join(', ') : (review.platform || '-');
     const sidebarPlatforms = document.getElementById('sidebar-platforms');
     if (sidebarPlatforms) sidebarPlatforms.textContent = platforms;
-    
+
     const sidebarGenre = document.getElementById('sidebar-genre');
     if (sidebarGenre) sidebarGenre.textContent = review.genre || '-';
-    
+
+    const sidebarModes = document.getElementById('sidebar-modes');
+    if (sidebarModes) sidebarModes.textContent = Array.isArray(review.modes) ? review.modes.join(', ') : (review.modes || '-');
+
+    const sidebarDevelopers = document.getElementById('sidebar-developers');
+    if (sidebarDevelopers) sidebarDevelopers.textContent = Array.isArray(review.developers) ? review.developers.join(', ') : (review.developers || '-');
+
+    const sidebarPublishers = document.getElementById('sidebar-publishers');
+    if (sidebarPublishers) sidebarPublishers.textContent = Array.isArray(review.publishers) ? review.publishers.join(', ') : (review.publishers || '-');
+
     const sidebarAuthor = document.getElementById('sidebar-author');
     if (sidebarAuthor) sidebarAuthor.textContent = review.author || '-';
-    
+
     const sidebarDate = document.getElementById('sidebar-date');
     if (sidebarDate) sidebarDate.textContent = review.date ? window.ReviewsData.formatDate(review.date) : '-';
     

@@ -133,6 +133,18 @@
                                 <p id="sidebar-genre" style="margin: var(--spacing-xs) 0 0;">-</p>
                             </div>
                             <div>
+                                <strong style="color: var(--text-muted); font-size: 0.85rem;">GAME MODES</strong>
+                                <p id="sidebar-modes" style="margin: var(--spacing-xs) 0 0;">-</p>
+                            </div>
+                            <div>
+                                <strong style="color: var(--text-muted); font-size: 0.85rem;">DEVELOPER</strong>
+                                <p id="sidebar-developers" style="margin: var(--spacing-xs) 0 0;">-</p>
+                            </div>
+                            <div>
+                                <strong style="color: var(--text-muted); font-size: 0.85rem;">PUBLISHER</strong>
+                                <p id="sidebar-publishers" style="margin: var(--spacing-xs) 0 0;">-</p>
+                            </div>
+                            <div>
                                 <strong style="color: var(--text-muted); font-size: 0.85rem;">REVIEWED BY</strong>
                                 <p id="sidebar-author" style="margin: var(--spacing-xs) 0 0;">-</p>
                             </div>
@@ -238,20 +250,33 @@
     
     <!-- Additional Review Page Script -->
     <script>
-        // Update sidebar information after review loads
+        // Update sidebar information after review loads (supports Firebase or local data)
         document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(() => {
+            (async () => {
                 const urlParams = new URLSearchParams(window.location.search);
                 const slug = urlParams.get('slug');
-                const review = window.ReviewsData.getReviewBySlug(slug);
-                
-                if (review) {
-                    document.getElementById('sidebar-platforms').textContent = review.platform.join(', ');
-                    document.getElementById('sidebar-genre').textContent = review.genre;
-                    document.getElementById('sidebar-author').textContent = review.author;
-                    document.getElementById('sidebar-date').textContent = window.ReviewsData.formatDate(review.date);
+                let review = null;
+
+                if (window.FirebaseReviews && window.FirebaseReviews.getReviewBySlug) {
+                    try {
+                        review = await window.FirebaseReviews.getReviewBySlug(slug);
+                    } catch (err) {
+                        console.error('Error fetching review from Firebase:', err);
+                    }
                 }
-            }, 100);
+
+                if (!review && window.ReviewsData && window.ReviewsData.getReviewBySlug) {
+                    review = window.ReviewsData.getReviewBySlug(slug);
+                }
+
+                if (review) {
+                    document.getElementById('sidebar-platforms').textContent = Array.isArray(review.platform) ? review.platform.join(', ') : (review.platform || '-');
+                    document.getElementById('sidebar-genre').textContent = review.genre || '-';
+                    document.getElementById('sidebar-author').textContent = review.author || '-';
+                    document.getElementById('sidebar-date').textContent = (window.ReviewsData && window.ReviewsData.formatDate && review.date) ? window.ReviewsData.formatDate(review.date) : (review.date || '-');
+                    document.getElementById('sidebar-modes').textContent = Array.isArray(review.modes) ? review.modes.join(', ') : (review.modes || '-');
+                }
+            })();
         });
         
         // Share functions
