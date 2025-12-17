@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="description" content="Admin panel for GameReview Hub - Manage your video game reviews.">
+    
+    <title>Admin Panel - GameReview Hub</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        /* Login Page Styles */
+        .login-container {
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-xl);
+            background: var(--bg-primary);
+        }
+        
+        .login-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-2xl);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-box h1 {
+            text-align: center;
+            margin-bottom: var(--spacing-sm);
+            font-size: 1.75rem;
+        }
+        
+        .login-box .subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .login-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-lg);
+            display: none;
+            font-size: 0.9rem;
+        }
+        
+        .login-error.show {
+            display: block;
+        }
+        
+        .login-box .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .login-box .btn-primary {
+            width: 100%;
+            padding: var(--spacing-md);
+        }
+        
+        .login-box .back-link {
+            display: block;
+            text-align: center;
+            margin-top: var(--spacing-xl);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .login-box .back-link a {
+            color: var(--accent-primary);
+        }
+        
+        /* User Bar */
+        .user-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md) var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .user-bar .user-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            color: var(--text-secondary);
+        }
+        
+        .user-bar .user-email {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .btn-logout {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-logout:hover {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Loading Spinner */
+        .loading-spinner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 80px);
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body data-page="admin">
+    <!-- ============================================
+         Header / Navigation
+         ============================================ -->
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">🎮</span>
+                <span>GameReview Hub</span>
+            </a>
+            
+            <nav class="nav">
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="reviews.html">Reviews</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+                
+                <a href="admin.html" class="btn btn-secondary btn-sm active">Login</a>
+                
+                <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="loading-spinner">
+        <p>Loading...</p>
+    </div>
+
+    <!-- ============================================
+         Login Section
+         ============================================ -->
+    <div id="loginSection" class="login-container hidden">
+        <div class="login-box">
+            <h1>Login</h1>
+            
+            <div id="loginError" class="login-error"></div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required placeholder="your-email@gmail.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required placeholder="Your password">
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    Sign In
+                </button>
+            </form>
+            
+            <p class="back-link">
+                <a href="index.html">← Back to Website</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- ============================================
+         Admin Panel (shown after login)
+         ============================================ -->
+    <div id="adminPanel" class="admin-container hidden">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div style="margin-bottom: var(--spacing-lg); padding-bottom: var(--spacing-md); border-bottom: 1px solid var(--border-color);">
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: var(--spacing-xs);">Logged in as</div>
+                <div id="userEmail" style="font-size: 0.85rem; color: var(--text-primary); word-break: break-all;"></div>
+            </div>
+            
+            <h3 style="margin-bottom: var(--spacing-lg); color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">
+                Admin Menu
+            </h3>
+            <ul class="admin-nav">
+                <li>
+                    <a href="#" class="active" onclick="showSection('section-dashboard')">
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showSection('section-reviews')">
+                        All Reviews
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showSection('section-add-review')">
+                        Add New Review
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showSection('section-settings')">
+                        Settings
+                    </a>
+                </li>
+            </ul>
+            
+            <div style="margin-top: auto; padding-top: var(--spacing-xl); display: flex; flex-direction: column; gap: var(--spacing-md);">
+                <a href="index.html" class="btn btn-secondary" style="width: 100%;">
+                    Back to Site
+                </a>
+                <button onclick="handleLogout()" class="btn-logout" style="width: 100%;">
+                    Sign Out
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-content">
+            <!-- Dashboard Section -->
+            <section id="section-dashboard" class="admin-section">
+                <div class="admin-header">
+                    <h1>Dashboard</h1>
+                    <button class="btn btn-primary" onclick="showSection('section-add-review'); resetForm();">
+                        Add New Review
+                    </button>
+                </div>
+                
+                <!-- Stats Cards -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
+                    <div class="admin-card" style="text-align: center;">
+                        <div style="font-size: 2.5rem; font-weight: 800; color: var(--accent-primary);" id="stat-total">0</div>
+                        <div style="color: var(--text-muted);">Total Reviews</div>
+                    </div>
+                    <div class="admin-card" style="text-align: center;">
+                        <div style="font-size: 2.5rem; font-weight: 800; color: var(--accent-secondary);" id="stat-avg">0</div>
+                        <div style="color: var(--text-muted);">Avg Rating</div>
+                    </div>
+                    <div class="admin-card" style="text-align: center;">
+                        <div style="font-size: 2.5rem; font-weight: 800; color: var(--accent-warning);" id="stat-featured">0</div>
+                        <div style="color: var(--text-muted);">Featured</div>
+                    </div>
+                    <div class="admin-card" style="text-align: center;">
+                        <div style="font-size: 2.5rem; font-weight: 800; color: var(--text-primary);" id="stat-genres">0</div>
+                        <div style="color: var(--text-muted);">Genres</div>
+                    </div>
+                </div>
+                
+                <!-- Recent Reviews -->
+                <div class="admin-card">
+                    <h3>Recent Reviews</h3>
+                    <div id="recent-reviews-table">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- All Reviews Section -->
+            <section id="section-reviews" class="admin-section" style="display: none;">
+                <div class="admin-header">
+                    <h1>All Reviews</h1>
+                    <button class="btn btn-primary" onclick="showSection('section-add-review'); resetForm();">
+                        Add New Review
+                    </button>
+                </div>
+                
+                <div class="admin-card">
+                    <div style="margin-bottom: var(--spacing-lg);">
+                        <input 
+                            type="text" 
+                            id="admin-search" 
+                            class="filter-input" 
+                            placeholder="Search reviews..."
+                            style="max-width: 300px;"
+                            oninput="filterAdminReviews()"
+                        >
+                    </div>
+                    
+                    <div style="overflow-x: auto;">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Title</th>
+                                    <th>Rating</th>
+                                    <th>Author</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reviews-table-body">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Add/Edit Review Section -->
+            <section id="section-add-review" class="admin-section" style="display: none;">
+                <div class="admin-header">
+                    <h1 id="form-title">Add New Review</h1>
+                </div>
+                
+                <div class="admin-card">
+                    <form id="review-form" onsubmit="handleReviewSubmit(event)">
+                        <input type="hidden" id="review-id" value="">
+                        
+                        <!-- Game Search Section -->
+                        <div class="form-group" style="margin-bottom: var(--spacing-xl); padding-bottom: var(--spacing-lg); border-bottom: 1px solid var(--border-color);">
+                            <label for="game-search" style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                                🔍 Search Game (RAWG API)
+                            </label>
+                            <div style="position: relative;">
+                                <input type="text" 
+                                       id="game-search" 
+                                       placeholder="Type a game name to auto-fill..." 
+                                       oninput="handleGameSearch(this.value)"
+                                       autocomplete="off">
+                                <span id="search-message" style="font-size: 0.85rem; margin-top: var(--spacing-xs); display: block;"></span>
+                                <div id="game-search-results" style="
+                                    display: none;
+                                    position: absolute;
+                                    top: 100%;
+                                    left: 0;
+                                    right: 0;
+                                    max-height: 400px;
+                                    overflow-y: auto;
+                                    background: #181c24;
+                                    border: 1px solid var(--border-color);
+                                    border-radius: var(--radius-md);
+                                    z-index: 100;
+                                    margin-top: var(--spacing-xs);
+                                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                                    opacity: 1;
+                                "></div>
+                            </div>
+                            <small style="color: var(--text-muted);">Search for a game to auto-fill title, genre, platforms, and cover image</small>
+                        </div>
+                        
+                        <div style="display: flex; flex-direction: column; gap: var(--spacing-lg);">
+                            <!-- Row 1: Title, Developers, Publishers -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--spacing-lg);">
+                                <div class="form-group">
+                                    <label for="review-title">Game Title *</label>
+                                    <input type="text" id="review-title" required placeholder="e.g., Elden Ring">
+                                </div>
+                                <div class="form-group">
+                                    <label for="review-developers">Main Developers</label>
+                                    <input type="text" id="review-developers" placeholder="e.g., FromSoftware" autocomplete="off">
+                                </div>
+                                <div class="form-group">
+                                    <label for="review-publishers">Publishers</label>
+                                    <input type="text" id="review-publishers" placeholder="e.g., Bandai Namco Entertainment" autocomplete="off">
+                                </div>
+                            </div>
+
+                            <!-- Row 2: Genre, Cover, Header -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--spacing-lg);">
+                                <div class="form-group">
+                                    <label for="review-genre">Genre *</label>
+                                    <select id="review-genre" required>
+                                        <option value="">Select genre...</option>
+                                        <option value="Action RPG">Action RPG</option>
+                                        <option value="RPG">RPG</option>
+                                        <option value="Action Adventure">Action Adventure</option>
+                                        <option value="Horror">Horror</option>
+                                        <option value="FPS">FPS</option>
+                                        <option value="Strategy">Strategy</option>
+                                        <option value="Sports">Sports</option>
+                                        <option value="Racing">Racing</option>
+                                        <option value="Puzzle">Puzzle</option>
+                                        <option value="Simulation">Simulation</option>
+                                        <option value="Indie">Indie</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="review-cover">Cover Image URL</label>
+                                    <input type="url" id="review-cover" placeholder="https://example.com/image.jpg">
+                                    <small style="color: var(--text-muted);">Recommended: 800x600 pixels</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="review-header">Header Image URL</label>
+                                    <input type="url" id="review-header" placeholder="https://example.com/header.jpg">
+                                    <small style="color: var(--text-muted);">Recommended: 1600x900 pixels</small>
+                                </div>
+                            </div>
+
+                            <!-- Row 3: Game Modes, Tags, Review Date -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--spacing-lg);">
+                                <div class="form-group">
+                                    <label for="review-modes">Game Modes</label>
+                                    <input type="text" id="review-modes" placeholder="e.g., Singleplayer, Multiplayer, Co-op">
+                                    <small style="color: var(--text-muted);">Comma-separated (saved and shown on game details)</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="review-tags">Tags (comma-separated)</label>
+                                    <input type="text" id="review-tags" placeholder="e.g., Open World, Fantasy, Souls-like">
+                                </div>
+                                <div class="form-group">
+                                    <label for="review-date">Review Date</label>
+                                    <input type="date" id="review-date">
+                                </div>
+                            </div>
+
+                            <!-- Row 4: Author, Rating, Featured -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--spacing-lg);">
+                                <div class="form-group">
+                                    <label for="review-author">Author *</label>
+                                    <select id="review-author" required>
+                                        <option value="">Select author...</option>
+                                        <option value="Alex">Alex</option>
+                                        <option value="Jordan">Jordan</option>
+                                        <option value="Sam">Sam</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="review-rating">Rating (1-10) *</label>
+                                    <input type="number" id="review-rating" required min="1" max="10" placeholder="8">
+                                </div>
+                                <div class="form-group">
+                                    <label for="review-featured">
+                                        <input type="checkbox" id="review-featured" style="width: auto; margin-right: var(--spacing-sm);">
+                                        Featured Review
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Row 5: Platforms (full-width) -->
+                            <div class="form-group">
+                                <label>Platforms *</label>
+                                <div id="review-platforms" class="platform-checkboxes" style="display: flex; flex-wrap: wrap; gap: var(--spacing-sm); margin-top: var(--spacing-xs);">
+                                    <label class="platform-checkbox">
+                                        <input type="checkbox" name="platform" value="PC"> PC
+                                    </label>
+                                    <label class="platform-checkbox">
+                                        <input type="checkbox" name="platform" value="PS5"> PS5
+                                    </label>
+                                    <label class="platform-checkbox">
+                                        <input type="checkbox" name="platform" value="PS4"> PS4
+                                    </label>
+                                    <label class="platform-checkbox">
+                                        <input type="checkbox" name="platform" value="Xbox Series X"> Xbox Series X
+                                    </label>
+                                    <label class="platform-checkbox">
+                                        <input type="checkbox" name="platform" value="Xbox One"> Xbox One
+                                    </label>
+                                    <label class="platform-checkbox">
+                                        <input type="checkbox" name="platform" value="Nintendo Switch"> Nintendo Switch
+                                    </label>
+                                    <label class="platform-checkbox">
+                                        <input type="checkbox" name="platform" value="Steam Deck"> Steam Deck
+                                    </label>
+                                    <label class="platform-checkbox">
+                                        <input type="checkbox" name="platform" value="Mobile"> Mobile
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Full Width Fields -->
+                        <div class="form-group">
+                            <label for="review-content">Full Review Content * (HTML supported)</label>
+                            <textarea id="review-content" required rows="12" placeholder="<p>Your detailed review goes here...</p>
+
+<h3>Section Title</h3>
+<p>More content...</p>"></textarea>
+                            <small style="color: var(--text-muted);">You can use HTML tags like &lt;p&gt;, &lt;h3&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;blockquote&gt;</small>
+                        </div>
+                        
+                        <div style="display: flex; gap: var(--spacing-md); justify-content: flex-end; margin-top: var(--spacing-lg);">
+                            <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                Save Review
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="section-settings" class="admin-section" style="display: none;">
+                <div class="admin-header">
+                    <h1>Settings</h1>
+                </div>
+                
+                <div class="admin-card">
+                    <h3>Data Management</h3>
+                    
+                    <div style="display: flex; flex-direction: column; gap: var(--spacing-lg);">
+                        <div>
+                            <h4 style="margin-bottom: var(--spacing-sm);">Export Reviews</h4>
+                            <p style="color: var(--text-muted); margin-bottom: var(--spacing-md);">
+                                Download all reviews as a JSON file for backup.
+                            </p>
+                            <button class="btn btn-secondary" onclick="exportReviews()">
+                                Export JSON
+                            </button>
+                        </div>
+                        
+                        <div style="padding-top: var(--spacing-lg); border-top: 1px solid var(--border-color);">
+                            <h4 style="margin-bottom: var(--spacing-sm);">Import Reviews</h4>
+                            <p style="color: var(--text-muted); margin-bottom: var(--spacing-md);">
+                                Import reviews from a JSON file. This will add to existing reviews.
+                            </p>
+                            <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importReviews(event)">
+                            <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">
+                                Import JSON
+                            </button>
+                        </div>
+                        
+                        <div style="padding-top: var(--spacing-lg); border-top: 1px solid var(--border-color);">
+                            <h4 style="margin-bottom: var(--spacing-sm); color: var(--accent-danger);">Reset All Data</h4>
+                            <p style="color: var(--text-muted); margin-bottom: var(--spacing-md);">
+                                Reset all reviews to the default placeholder data. This cannot be undone.
+                            </p>
+                            <button class="btn btn-secondary" style="border-color: var(--accent-danger); color: var(--accent-danger);" onclick="confirmReset()">
+                                Reset to Default
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    </div> <!-- End adminPanel -->
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Firebase Config & Reviews -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-reviews.js"></script>
+    <script src="js/rawg-api.js"></script>
+    
+    <!-- Admin Authentication Script -->
+    <script>
+        // DOM Elements
+        const loadingState = document.getElementById('loadingState');
+        const loginSection = document.getElementById('loginSection');
+        const adminPanel = document.getElementById('adminPanel');
+        const loginForm = document.getElementById('loginForm');
+        const loginError = document.getElementById('loginError');
+        
+        // Check auth state on page load
+        window.firebaseAuth.onAuthStateChanged(async (user) => {
+            loadingState.classList.add('hidden');
+            
+            if (user && window.firebaseAuth.isAdmin(user)) {
+                // User is signed in and is admin
+                showAdminPanel(user);
+            } else if (user) {
+                // User is signed in but NOT admin
+                await window.firebaseAuth.signOut();
+                showLoginForm();
+                showError("You don't have admin access.");
+            } else {
+                // User is not signed in
+                showLoginForm();
+            }
+        });
+        
+        // Show login form
+        function showLoginForm() {
+            loginSection.classList.remove('hidden');
+            adminPanel.classList.add('hidden');
+        }
+        
+        // Show admin panel
+        async function showAdminPanel(user) {
+            loginSection.classList.add('hidden');
+            adminPanel.classList.remove('hidden');
+            
+            // Update user email display
+            const userEmailEl = document.getElementById('userEmail');
+            if (userEmailEl) {
+                userEmailEl.textContent = user.email;
+            }
+            
+            // Initialize admin panel
+            await initAdminDashboard();
+        }
+        
+        // Show error message
+        function showError(message) {
+            loginError.textContent = message;
+            loginError.classList.add('show');
+        }
+        
+        // Login form submit
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Clear previous errors
+            loginError.classList.remove('show');
+            
+            const result = await window.firebaseAuth.signIn(email, password);
+            
+            if (!result.success) {
+                showError(result.error);
+            }
+            // If successful, onAuthStateChanged will handle showing admin panel
+        });
+        
+        // Logout handler
+        function handleLogout() {
+            window.firebaseAuth.signOut();
+        }
+        
+        // ============================================
+        // Admin Panel Functions
+        // ============================================
+        
+        async function initAdminDashboard() {
+            // Set default date to today
+            document.getElementById('review-date').value = new Date().toISOString().split('T')[0];
+            
+            await updateDashboardStats();
+            await renderRecentReviews();
+            await renderAllReviews();
+        }
+        
+        async function updateDashboardStats() {
+            const stats = await window.FirebaseReviews.getDashboardStats();
+            
+            document.getElementById('stat-total').textContent = stats.totalReviews;
+            document.getElementById('stat-avg').textContent = stats.avgRating;
+            document.getElementById('stat-featured').textContent = stats.featuredCount;
+            document.getElementById('stat-genres').textContent = stats.genreCount;
+        }
+        
+        async function renderRecentReviews() {
+            const reviews = await window.FirebaseReviews.getLatestReviews(5);
+            const container = document.getElementById('recent-reviews-table');
+            
+            if (!container) return;
+            
+            if (reviews.length === 0) {
+                container.innerHTML = `
+                    <p style="text-align: center; padding: var(--spacing-lg); color: var(--text-muted);">
+                        No reviews yet. Add your first review!
+                    </p>
+                `;
+                return;
+            }
+            
+            // Format date function
+            function formatDateNice(dateStr) {
+                if (!dateStr) return '-';
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            }
+            
+            container.innerHTML = `
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Rating</th>
+                            <th>Author</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${reviews.map(review => `
+                            <tr>
+                                <td><a href="review.html?slug=${review.id}" target="_blank" style="color: var(--accent-primary); text-decoration: none;"><strong>${review.title}</strong></a></td>
+                                <td><span class="rating-badge">${review.rating}/10</span></td>
+                                <td>${review.author || '-'}</td>
+                                <td>${formatDateNice(review.date)}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-secondary" onclick="editReview('${review.id}')">Edit</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        async function renderAllReviews() {
+            const reviews = await window.FirebaseReviews.getAllReviews();
+            const tbody = document.getElementById('reviews-table-body');
+            
+            if (reviews.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: var(--spacing-xl); color: var(--text-muted);">
+                            No reviews yet. Add your first review!
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = reviews.map(review => `
+                <tr>
+                    <td>${review.id}</td>
+                    <td><strong>${review.title}</strong></td>
+                    <td><span class="rating-badge">${review.rating}/10</span></td>
+                    <td>${review.author}</td>
+                    <td>${review.date || '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary" onclick="editReview('${review.id}')">Edit</button>
+                        <button class="btn btn-sm" style="background: #ef4444; color: white;" onclick="confirmDeleteReview('${review.id}', '${review.title ? review.title.replace(/'/g, "\\'") : ''}')">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Handle review form submission
+        async function handleReviewSubmit(event) {
+            event.preventDefault();
+            
+            // Get selected platforms
+            const platformCheckboxes = document.querySelectorAll('input[name="platform"]:checked');
+            const platforms = Array.from(platformCheckboxes).map(cb => cb.value);
+            
+            if (platforms.length === 0) {
+                alert('Please select at least one platform.');
+                return;
+            }
+            
+            const content = document.getElementById('review-content').value.trim();
+            
+            // Generate excerpt from content
+            const plainText = content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+            const excerpt = plainText.length > 150 ? plainText.substring(0, 150) + '...' : plainText;
+            
+            // Get author avatar
+            const author = document.getElementById('review-author').value;
+            const avatars = {
+                'Alex': 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop',
+                'Jordan': 'https://images.unsplash.com/photo-1599566150163-29194dcabd36?w=100&h=100&fit=crop',
+                'Sam': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop'
+            };
+            
+            const reviewData = {
+                title: document.getElementById('review-title').value.trim(),
+                genre: document.getElementById('review-genre').value,
+                modes: document.getElementById('review-modes')?.value.split(',').map(t => t.trim()).filter(t => t),
+                platform: platforms,
+                rating: parseFloat(document.getElementById('review-rating').value),
+                author: author,
+                authorAvatar: avatars[author] || avatars['Alex'],
+                date: document.getElementById('review-date').value || new Date().toISOString().split('T')[0],
+                featured: document.getElementById('review-featured').checked,
+                coverImage: document.getElementById('review-cover').value.trim() || 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=800&h=600&fit=crop',
+                headerImage: document.getElementById('review-header').value.trim() || 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=1600&h=900&fit=crop',
+                tags: document.getElementById('review-tags').value.split(',').map(t => t.trim()).filter(t => t),
+                developers: document.getElementById('review-developers').value.split(',').map(t => t.trim()).filter(t => t),
+                publishers: document.getElementById('review-publishers').value.split(',').map(t => t.trim()).filter(t => t),
+                excerpt: excerpt,
+                content: content
+            };
+            
+            // Check if editing or adding
+            const reviewId = document.getElementById('review-id').value;
+            let result;
+            
+            if (reviewId) {
+                // Update existing review
+                result = await window.FirebaseReviews.updateReview(reviewId, reviewData);
+            } else {
+                // Add new review
+                result = await window.FirebaseReviews.addReview(reviewData);
+            }
+            
+            if (result.success) {
+                alert(reviewId ? 'Review updated successfully!' : 'Review added successfully!');
+                resetForm();
+                await updateDashboardStats();
+                await renderAllReviews();
+                showSection('section-reviews');
+            } else {
+                alert('Error: ' + result.error);
+            }
+        }
+        
+        // Edit review
+        async function editReview(id) {
+            let review = await window.FirebaseReviews.getReviewBySlug(id);
+            if (!review) {
+                alert('Review not found');
+                return;
+            }
+
+            // Populate form
+            document.getElementById('review-id').value = id;
+            document.getElementById('review-title').value = review.title || '';
+            document.getElementById('review-genre').value = review.genre || '';
+            document.getElementById('review-rating').value = review.rating || '';
+            document.getElementById('review-author').value = review.author || '';
+            document.getElementById('review-date').value = review.date || '';
+            document.getElementById('review-featured').checked = !!review.featured;
+            document.getElementById('review-cover').value = review.coverImage || '';
+            document.getElementById('review-header').value = review.headerImage || '';
+            document.getElementById('review-tags').value = review.tags ? (Array.isArray(review.tags) ? review.tags.join(', ') : review.tags) : '';
+            document.getElementById('review-content').value = review.content || '';
+            document.getElementById('review-developers').value = review.developers ? (Array.isArray(review.developers) ? review.developers.join(', ') : review.developers) : '';
+            document.getElementById('review-publishers').value = review.publishers ? (Array.isArray(review.publishers) ? review.publishers.join(', ') : review.publishers) : '';
+
+            // Set platform checkboxes
+            document.querySelectorAll('input[name="platform"]').forEach(cb => {
+                cb.checked = review.platform && review.platform.includes(cb.value);
+            });
+
+            // Populate modes if present
+            if (document.getElementById('review-modes')) {
+                if (review.modes && Array.isArray(review.modes) && review.modes.length > 0) {
+                    document.getElementById('review-modes').value = review.modes.join(', ');
+                } else {
+                    // attempt to auto-fill modes from RAWG and persist
+                    try {
+                        if (window.RAWG && review.title) {
+                            const results = await window.RAWG.searchGames(review.title);
+                            if (results && results.length > 0) {
+                                const gameId = results[0].id;
+                                const gameDetails = await window.RAWG.getGameDetails(gameId);
+                                const detected = (window.RAWG.mapModes && typeof window.RAWG.mapModes === 'function') ? window.RAWG.mapModes(gameDetails) : [];
+                                if (detected && detected.length > 0) {
+                                    document.getElementById('review-modes').value = detected.join(', ');
+                                    // persist back to Firebase
+                                    try {
+                                        await window.FirebaseReviews.updateReview(id, { modes: detected });
+                                    } catch (err) {
+                                        console.warn('Failed to persist modes to Firebase:', err);
+                                    }
+                                }
+                            }
+                        }
+                    } catch (err) {
+                        console.warn('Auto-fill modes failed:', err);
+                    }
+                }
+            }
+
+            // Update form title
+            document.getElementById('form-title').textContent = 'Edit Review';
+
+            // Show form section
+            showSection('section-add-review');
+        }
+        
+        // Delete review
+        async function confirmDeleteReview(id, title) {
+            if (confirm(`Are you sure you want to delete "${title}"?`)) {
+                const result = await window.FirebaseReviews.deleteReview(id);
+                if (result.success) {
+                    alert('Review deleted successfully!');
+                    await updateDashboardStats();
+                    await renderAllReviews();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            }
+        }
+        
+        // Reset form
+        function resetForm() {
+            document.getElementById('review-form').reset();
+            document.getElementById('review-id').value = '';
+            document.getElementById('form-title').textContent = 'Add New Review';
+            document.getElementById('review-date').value = new Date().toISOString().split('T')[0];
+            document.querySelectorAll('input[name="platform"]').forEach(cb => cb.checked = false);
+            // Clear game search
+            document.getElementById('game-search').value = '';
+            document.getElementById('game-search-results').style.display = 'none';
+            document.getElementById('search-message').textContent = '';
+        }
+        
+        // Show section
+        function showSection(sectionId) {
+            document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none');
+            document.getElementById(sectionId).style.display = 'block';
+            
+            document.querySelectorAll('.admin-nav a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('onclick')?.includes(sectionId)) {
+                    link.classList.add('active');
+                }
+            });
+        }
+        
+        // ============================================
+        // Settings Functions
+        // ============================================
+        
+        // Export reviews to JSON file
+        async function exportReviews() {
+            try {
+                const reviews = await window.FirebaseReviews.getAllReviews();
+                const dataStr = JSON.stringify(reviews, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `reviews-backup-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                alert('Reviews exported successfully!');
+            } catch (error) {
+                alert('Error exporting reviews: ' + error.message);
+            }
+        }
+        
+        // Import reviews from JSON file
+        async function importReviews(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            try {
+                const text = await file.text();
+                const reviews = JSON.parse(text);
+                
+                if (!Array.isArray(reviews)) {
+                    alert('Invalid file format. Expected an array of reviews.');
+                    return;
+                }
+                
+                if (!confirm(`Import ${reviews.length} reviews? This will add them to your existing reviews.`)) {
+                    return;
+                }
+                
+                let imported = 0;
+                for (const review of reviews) {
+                    // Remove id so Firebase creates new ones
+                    const { id, ...reviewData } = review;
+                    const result = await window.FirebaseReviews.addReview(reviewData);
+                    if (result.success) imported++;
+                }
+                
+                alert(`Successfully imported ${imported} reviews!`);
+                await initAdminDashboard();
+                
+            } catch (error) {
+                alert('Error importing reviews: ' + error.message);
+            }
+            
+            // Reset file input
+            event.target.value = '';
+        }
+        
+        // Reset all data (delete all reviews from Firebase)
+        async function confirmReset() {
+            const userInput = prompt('This will permanently delete ALL reviews from the database.\n\nType "reset" to confirm:');
+            
+            if (userInput === null) {
+                return; // User clicked Cancel
+            }
+            
+            if (userInput.toLowerCase() !== 'reset') {
+                alert('Reset cancelled. You must type "reset" to confirm.');
+                return;
+            }
+            
+            try {
+                const reviews = await window.FirebaseReviews.getAllReviews();
+                
+                for (const review of reviews) {
+                    await window.FirebaseReviews.deleteReview(review.id);
+                }
+                
+                alert('All reviews have been deleted.');
+                await initAdminDashboard();
+                
+            } catch (error) {
+                alert('Error resetting data: ' + error.message);
+            }
+        }
+        
+        // Make functions global
+        window.handleReviewSubmit = handleReviewSubmit;
+        window.editReview = editReview;
+        window.confirmDeleteReview = confirmDeleteReview;
+        window.resetForm = resetForm;
+        window.showSection = showSection;
+        window.handleLogout = handleLogout;
+        window.exportReviews = exportReviews;
+        window.importReviews = importReviews;
+        window.confirmReset = confirmReset;
+    </script>
+</body>
+</html>

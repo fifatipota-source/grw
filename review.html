@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Read our in-depth video game review at GameReview Hub.">
+    <meta name="keywords" content="video game review, game rating, gaming">
+    <meta name="author" content="GameReview Hub">
+    
+    <title>Review - GameReview Hub</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="review">
+    <!-- ============================================
+         Header / Navigation
+         ============================================ -->
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">🎮</span>
+                <span>GameReview Hub</span>
+            </a>
+            
+            <nav class="nav">
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="reviews.html">Reviews</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+                
+                    <a href="admin.html" class="btn btn-secondary btn-sm">Login</a>
+                
+                <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ============================================
+         Review Header
+         ============================================ -->
+    <section class="review-header">
+        <!-- Background Image (Blurred) -->
+        <div class="review-header-bg">
+            <img src="https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=1600&h=900&fit=crop" alt="Game Background">
+        </div>
+        
+        <div class="container">
+            <div class="review-header-content">
+                <!-- Cover Image -->
+                <div class="review-cover">
+                    <img src="https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=600&h=800&fit=crop" alt="Game Cover">
+                </div>
+                
+                <!-- Review Info -->
+                <div class="review-info">
+                    <h1 id="review-title">Loading...</h1>
+                    
+                    <div id="review-meta" class="review-meta">
+                        <span class="review-meta-item">📅 Loading...</span>
+                    </div>
+                    
+                    <div id="review-tags" class="review-tags">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         Review Content
+         ============================================ -->
+    <section class="section">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--spacing-2xl);">
+                <!-- Main Content -->
+                <div class="review-content">
+                    <!-- Rating Box -->
+                    <div id="review-rating" class="rating-large">
+                        <div class="rating-circle">--</div>
+                        <div class="rating-details">
+                            <h4>Loading...</h4>
+                            <div class="rating-stars">
+                                <span class="rating-star">★</span>
+                                <span class="rating-star">★</span>
+                                <span class="rating-star">★</span>
+                                <span class="rating-star">★</span>
+                                <span class="rating-star">★</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Review Body -->
+                    <div id="review-body" class="review-body">
+                        <p style="color: var(--text-muted);">Loading review content...</p>
+                    </div>
+                    
+                    <!-- Share Section -->
+                    <div style="margin-top: var(--spacing-2xl); padding-top: var(--spacing-xl); border-top: 1px solid var(--border-color);">
+                        <h4 style="margin-bottom: var(--spacing-md);">Share This Review</h4>
+                        <div class="social-links" style="justify-content: flex-start;">
+                            <a href="#" onclick="shareOnTwitter()" aria-label="Share on Twitter"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+                            <a href="#" onclick="shareOnInstagram()" aria-label="Share on Instagram"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+                            <a href="#" onclick="shareOnReddit()" aria-label="Share on Reddit"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg></a>
+                            <a href="#" onclick="shareOnFacebook()" aria-label="Share on Facebook"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+                            <a href="#" onclick="copyLink()" aria-label="Copy Link"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sidebar -->
+                <aside>
+                    <!-- Game Info Box -->
+                    <div class="admin-card" style="position: sticky; top: 100px;">
+                        <h3>Game Details</h3>
+                        <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                            <div>
+                                <strong style="color: var(--text-muted); font-size: 0.85rem;">PLATFORMS</strong>
+                                <p id="sidebar-platforms" style="margin: var(--spacing-xs) 0 0;">-</p>
+                            </div>
+                            <div>
+                                <strong style="color: var(--text-muted); font-size: 0.85rem;">GENRE</strong>
+                                <p id="sidebar-genre" style="margin: var(--spacing-xs) 0 0;">-</p>
+                            </div>
+                            <div>
+                                <strong style="color: var(--text-muted); font-size: 0.85rem;">GAME MODES</strong>
+                                <p id="sidebar-modes" style="margin: var(--spacing-xs) 0 0;">-</p>
+                            </div>
+                            <div>
+                                <strong style="color: var(--text-muted); font-size: 0.85rem;">DEVELOPER</strong>
+                                <p id="sidebar-developers" style="margin: var(--spacing-xs) 0 0;">-</p>
+                            </div>
+                            <div>
+                                <strong style="color: var(--text-muted); font-size: 0.85rem;">PUBLISHER</strong>
+                                <p id="sidebar-publishers" style="margin: var(--spacing-xs) 0 0;">-</p>
+                            </div>
+                            <div>
+                                <strong style="color: var(--text-muted); font-size: 0.85rem;">REVIEWED BY</strong>
+                                <p id="sidebar-author" style="margin: var(--spacing-xs) 0 0;">-</p>
+                            </div>
+                            <div>
+                                <strong style="color: var(--text-muted); font-size: 0.85rem;">REVIEW DATE</strong>
+                                <p id="sidebar-date" style="margin: var(--spacing-xs) 0 0;">-</p>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: var(--spacing-lg); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-color);">
+                            <a href="reviews.html" class="btn btn-secondary" style="width: 100%;">
+                                Back to Reviews
+                            </a>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         Related Reviews Section
+         ============================================ -->
+    <section class="section" style="background-color: var(--bg-secondary);">
+        <div class="container">
+            <div class="section-title">
+                <h2>Related Reviews</h2>
+                <p>You might also enjoy these</p>
+            </div>
+            
+            <div id="related-reviews" class="reviews-grid">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         Footer
+         ============================================ -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">
+                        <span class="logo-icon">🎮</span>
+                        <span>GameReview Hub</span>
+                    </a>
+                    <p>Honest video game reviews by three friends who share their passion for gaming. No sponsorships, no bias — just genuine opinions.</p>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="reviews.html">Reviews</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Categories</h4>
+                    <ul>
+                        <li><a href="reviews.html?genre=Action RPG">Action RPG</a></li>
+                        <li><a href="reviews.html?genre=Horror">Horror</a></li>
+                        <li><a href="reviews.html?genre=Adventure">Adventure</a></li>
+                        <li><a href="reviews.html?genre=RPG">RPG</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Follow Us</h4>
+                    <ul>
+                        <li><a href="#">Twitter</a></li>
+                        <li><a href="#">Instagram</a></li>
+                        <li><a href="#">Discord</a></li>
+                        <li><a href="#">Facebook</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 GameReview Hub. All rights reserved.</p>
+                <div class="social-links">
+                    <a href="#" aria-label="Twitter"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+                    <a href="#" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+                    <a href="#" aria-label="Discord"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189z"/></svg></a>
+                    <a href="#" aria-label="Facebook"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-reviews.js"></script>
+    
+    <!-- Main Scripts -->
+    <script src="js/reviews-data.js"></script>
+    <script src="js/main.js"></script>
+    
+    <!-- Additional Review Page Script -->
+    <script>
+        // Update sidebar information after review loads (supports Firebase or local data)
+        document.addEventListener('DOMContentLoaded', function() {
+            (async () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const slug = urlParams.get('slug');
+                let review = null;
+
+                if (window.FirebaseReviews && window.FirebaseReviews.getReviewBySlug) {
+                    try {
+                        review = await window.FirebaseReviews.getReviewBySlug(slug);
+                    } catch (err) {
+                        console.error('Error fetching review from Firebase:', err);
+                    }
+                }
+
+                if (!review && window.ReviewsData && window.ReviewsData.getReviewBySlug) {
+                    review = window.ReviewsData.getReviewBySlug(slug);
+                }
+
+                if (review) {
+                    document.getElementById('sidebar-platforms').textContent = Array.isArray(review.platform) ? review.platform.join(', ') : (review.platform || '-');
+                    document.getElementById('sidebar-genre').textContent = review.genre || '-';
+                    document.getElementById('sidebar-author').textContent = review.author || '-';
+                    document.getElementById('sidebar-date').textContent = (window.ReviewsData && window.ReviewsData.formatDate && review.date) ? window.ReviewsData.formatDate(review.date) : (review.date || '-');
+                    document.getElementById('sidebar-modes').textContent = Array.isArray(review.modes) ? review.modes.join(', ') : (review.modes || '-');
+                }
+            })();
+        });
+        
+        // Share functions
+        function shareOnTwitter() {
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent(document.getElementById('review-title').textContent);
+            window.open(`https://twitter.com/intent/tweet?url=${url}&text=Check out this review: ${title}`, '_blank');
+        }
+        
+        function shareOnInstagram() {
+            // Instagram doesn't support direct URL sharing, so we copy the link and notify user
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                window.GameReviewUtils.showToast('Link copied! Share it on Instagram.', 'success');
+            });
+        }
+        
+        function shareOnReddit() {
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent(document.getElementById('review-title').textContent);
+            window.open(`https://reddit.com/submit?url=${url}&title=${title}`, '_blank');
+        }
+        
+        function shareOnFacebook() {
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+        }
+        
+        function copyLink() {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                window.GameReviewUtils.showToast('Link copied to clipboard!', 'success');
+            });
+        }
+    </script>
+</body>
+</html>
